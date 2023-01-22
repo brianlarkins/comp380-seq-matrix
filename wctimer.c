@@ -6,14 +6,17 @@
 /*                                                      */
 /* ******************************************************/
 #include <stdio.h>
+#include <string.h>
 
 #include "wctimer.h"
+
+double tsc_cpu_hz = 0.0; // global variable, shhh.
 
 /**
  * gtc_tsc_calibrate - calibrate the TSC timer
  * @return the calculated MHz of the current PE for tick-to-ns conversion
  */
-double wc_tsc_calibrate(void) {
+void wc_tsc_calibrate(void) {
   struct timespec start, end, sleep;
   uint64_t tscstart, tscend, tscdiff, clockdiff;
   double tscticks;
@@ -30,11 +33,11 @@ double wc_tsc_calibrate(void) {
     memset(&start, 0, sizeof(start));
     memset(&end, 0, sizeof(end));
 
-    start = gtc_get_wtime();
-    tscstart = gtc_get_tsctime();
+    start = wc_get_wtime();
+    tscstart = wc_get_tsctime();
     nanosleep(&sleep, NULL);
-    tscend   = gtc_get_tsctime();
-    end = gtc_get_wtime();
+    tscend   = wc_get_tsctime();
+    end = wc_get_wtime();
     end.tv_sec  -= start.tv_sec;
     end.tv_nsec -= start.tv_nsec;
     clockdiff += (1000000000L * (end.tv_sec)) + end.tv_nsec; // should be 25M ns
@@ -51,5 +54,6 @@ double wc_tsc_calibrate(void) {
         tscticks,
         (clockdiff/(double)1e6),
         ((tscdiff/tscticks)/(double)1e3));
-  return tscticks;
+
+  tsc_cpu_hz = tscticks; // store calibrated ticks/sec in global
 }

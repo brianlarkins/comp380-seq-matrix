@@ -8,16 +8,24 @@
 
 
 int main(int argc, char **argv) {
-  double start, end;
+  wc_timer_t t;
 
   if (argc < 2) {
     printf("usage: lab1 <size>\n\t<size>\t size of matrices and vectors\n");
     exit(-1);
   }
 
+  wc_tsc_calibrate();   // we must always calibrate the TSC timer in every program
+  WC_INIT_TIMER(t);     // timers must be initialized before use
+
   /* timer example */
-  start = get_wctime();
+  WC_START_TIMER(t);   // start as close to the code you want to measure
+
   /* do stuff that takes time */
-  end = get_wctime();
-  printf("timer duration: %10.7f ms\n", (end-start)*1000.0); // 1000 converts s to ms
+  usleep(1000);
+
+  WC_STOP_TIMER(t);    // stop timer when you're done
+
+  // there are nice macros to convert times to different units -- see wctimer.h
+  printf("timer duration: %10.3f ms\n", WC_READ_TIMER_MSEC(t));
 }

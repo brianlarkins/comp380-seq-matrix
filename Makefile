@@ -1,4 +1,10 @@
 all: lab1
 
-lab1: lab1.o timer.o
+CC=gcc
+CFLAGS=-g
+
+lab1: lab1.o wctimer.o
 	$(CC) -o $@ $^ -lm
+
+clean:
+	rm -f *.o lab1
